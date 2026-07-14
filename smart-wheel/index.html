@@ -1,1 +1,727 @@
-<!doctype html><html lang='zh-CN'><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>聪明程度转盘</title><style>body{text-align:center;background:#f5f0e5;font-family:PingFang SC,Arial}canvas{max-width:90vw;background:#fff;border-radius:50%;box-shadow:0 8px 30px #999}button{padding:12px 30px;font-size:20px;border-radius:20px;background:#303c91;color:white;border:0}#r{font-size:28px;font-weight:bold}</style><h1>聪明程度转盘</h1><canvas id='c' width='700' height='700'></canvas><div id='r'>准备好了吗？</div><button onclick='spin()'>转一下</button><script>let c=document.getElementById('c'),x=c.getContext('2d'),a=0,b=false;let n=['大笨蛋','很笨','笨','有点笨','普通','偏聪明','比较聪明','聪明','很聪明','天才'];let col=['#8d6e63','#a1887f','#bcaaa4','#ddd','#ffe082','#a5d6a7','#81c784','#4db6ac','#64b5f6','#ba68c8'];let start=0;function draw(){x.clearRect(0,0,700,700);x.save();x.translate(350,350);x.rotate(a);for(let i=0;i<10;i++){x.beginPath();x.moveTo(0,0);x.arc(0,0,280,-Math.PI/2+i*Math.PI/10,-Math.PI/2+(i+1)*Math.PI/10);x.fillStyle=col[i];x.fill();x.stroke();x.save();x.rotate(-Math.PI/2+(i+.5)*Math.PI/10);x.translate(190,0);x.rotate(Math.PI/2);x.font='bold 22px sans-serif';x.fillStyle='#222';x.fillText(n[i],-35,0);x.restore()}x.restore();x.fillStyle='red';x.beginPath();x.moveTo(350,15);x.lineTo(330,60);x.lineTo(370,60);x.fill()}draw();function spin(){if(b)return;b=true;let s=a,t=a+Math.PI*2*(8+Math.random()*3)+Math.random()*Math.PI*2,z=0;function f(){z+=16;let p=Math.min(z/5200,1),e=1-Math.pow(1-p,4);a=s+(t-s)*e;draw();if(p<1)requestAnimationFrame(f);else{b=false;let deg=((a*180/Math.PI)%360+360)%360;let score=Math.round(deg/360*100)%101;let idx=Math.min(9,Math.floor(score/10));document.getElementById('r').innerText='结果：'+n[idx]+'，刻度 '+score+'格'}}requestAnimationFrame(f)}</script></html>
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f4efdf">
+  <meta name="description" content="一个接近手绘原稿的聪明程度转盘网页游戏。">
+  <title>聪明程度转盘</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #24221f;
+      --muted-ink: #645f56;
+      --paper: #f4efdf;
+      --paper-deep: #e9e0c8;
+      --normal: #8b3f2d;
+      --egg: #5c3489;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      min-height: 100%;
+      margin: 0;
+    }
+
+    body {
+      display: grid;
+      place-items: start center;
+      overflow-x: hidden;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 16% 10%, rgb(255 255 255 / 0.65), transparent 30rem),
+        repeating-linear-gradient(0deg, rgb(77 64 40 / 0.025) 0 1px, transparent 1px 5px),
+        var(--paper);
+      font-family: "Kaiti SC", "STKaiti", KaiTi, "Marker Felt", "Bradley Hand", system-ui, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .game {
+      width: min(100%, 760px);
+      min-height: 100svh;
+      padding: clamp(20px, 4vw, 38px) clamp(12px, 3vw, 24px) 34px;
+      text-align: center;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(30px, 7vw, 52px);
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      line-height: 1.05;
+      transform: rotate(-0.7deg);
+    }
+
+    .intro {
+      margin: 9px 0 2px;
+      color: var(--muted-ink);
+      font-family: inherit;
+      font-size: clamp(13px, 3.3vw, 17px);
+      letter-spacing: 0.04em;
+    }
+
+    .wheel-stage {
+      position: relative;
+      width: min(100%, 660px);
+      margin: 2px auto 0;
+    }
+
+    svg {
+      display: block;
+      width: 100%;
+      height: auto;
+      overflow: visible;
+      user-select: none;
+      touch-action: manipulation;
+    }
+
+    .rough-line {
+      fill: none;
+      stroke: var(--ink);
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .outer-arc {
+      stroke-width: 4.2;
+    }
+
+    .echo-arc {
+      opacity: 0.28;
+      stroke-width: 1.5;
+    }
+
+    .inner-arc {
+      opacity: 0.48;
+      stroke-width: 1.4;
+    }
+
+    .tick {
+      stroke: var(--ink);
+      stroke-linecap: round;
+    }
+
+    .tick--small {
+      opacity: 0.72;
+      stroke-width: 1.25;
+    }
+
+    .tick--mid {
+      stroke-width: 2;
+    }
+
+    .tick--major {
+      stroke-width: 3;
+    }
+
+    .scale-number,
+    .grade-label {
+      fill: var(--ink);
+      paint-order: stroke;
+      stroke: var(--paper);
+      stroke-linejoin: round;
+      text-anchor: middle;
+    }
+
+    .scale-number {
+      font-family: "Marker Felt", "Bradley Hand", "Kaiti SC", KaiTi, sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      stroke-width: 4px;
+    }
+
+    .grade-label {
+      font-size: 19px;
+      font-weight: 800;
+      letter-spacing: 0.03em;
+      stroke-width: 5px;
+    }
+
+    #pointer {
+      transform-box: view-box;
+      transform-origin: 310px 310px;
+    }
+
+    .needle {
+      fill: #2b2925;
+      stroke: #171613;
+      stroke-width: 1.2;
+      stroke-linejoin: round;
+    }
+
+    .needle-highlight {
+      fill: none;
+      stroke: rgb(255 255 255 / 0.38);
+      stroke-width: 1.2;
+      stroke-linecap: round;
+    }
+
+    .hub-outer {
+      fill: var(--paper);
+      stroke: var(--ink);
+      stroke-width: 4;
+    }
+
+    .hub-inner {
+      fill: var(--ink);
+    }
+
+    .controls {
+      display: grid;
+      justify-items: center;
+      gap: 14px;
+      width: min(100%, 520px);
+      margin: -18px auto 0;
+      position: relative;
+      z-index: 2;
+    }
+
+    .result {
+      display: grid;
+      place-items: center;
+      align-content: center;
+      width: min(100%, 440px);
+      min-height: 98px;
+      padding: 13px 20px;
+      border: 2px solid var(--ink);
+      border-radius: 50% 47% 49% 46% / 14% 18% 15% 17%;
+      background: rgb(249 246 235 / 0.86);
+      box-shadow: 3px 4px 0 rgb(49 44 35 / 0.12);
+      transform: rotate(0.25deg);
+      transition: color 180ms ease, border-color 180ms ease, background 180ms ease;
+    }
+
+    .result__hint {
+      color: var(--muted-ink);
+      font-size: 15px;
+      letter-spacing: 0.06em;
+    }
+
+    .result__main {
+      margin-top: 3px;
+      font-family: inherit;
+      font-size: clamp(25px, 6vw, 36px);
+      font-weight: 900;
+      line-height: 1.15;
+    }
+
+    .result__value {
+      display: inline-block;
+      min-width: 1.8em;
+      font-family: "Marker Felt", "Bradley Hand", system-ui, sans-serif;
+      font-size: 1.18em;
+    }
+
+    .result[data-kind="normal"] {
+      color: var(--normal);
+      border-color: var(--normal);
+    }
+
+    .result[data-kind="egg"] {
+      color: var(--egg-tone, var(--egg));
+      border-color: var(--egg-tone, var(--egg));
+      background: rgb(241 234 248 / 0.88);
+      border-radius: 46% 51% 43% 54% / 18% 14% 20% 13%;
+      transform: rotate(-0.45deg);
+    }
+
+    .result[data-kind="spinning"] .result__main {
+      color: var(--muted-ink);
+      animation: breathe 780ms ease-in-out infinite alternate;
+    }
+
+    @keyframes breathe {
+      to {
+        opacity: 0.48;
+        transform: translateY(2px);
+      }
+    }
+
+    button {
+      min-width: 156px;
+      min-height: 52px;
+      padding: 10px 30px 9px;
+      border: 3px solid var(--ink);
+      border-radius: 49% 46% 51% 43% / 44% 52% 45% 54%;
+      color: var(--paper);
+      background: var(--ink);
+      box-shadow: 3px 4px 0 rgb(32 29 24 / 0.2);
+      font: 900 clamp(20px, 5vw, 25px)/1 "Kaiti SC", "STKaiti", KaiTi, system-ui, sans-serif;
+      letter-spacing: 0.12em;
+      cursor: pointer;
+      transform: rotate(-0.7deg);
+      transition: transform 120ms ease, box-shadow 120ms ease, opacity 120ms ease;
+    }
+
+    button:hover:not(:disabled) {
+      transform: translateY(-2px) rotate(-0.7deg);
+      box-shadow: 4px 6px 0 rgb(32 29 24 / 0.2);
+    }
+
+    button:active:not(:disabled) {
+      transform: translateY(2px) rotate(-0.7deg);
+      box-shadow: 1px 2px 0 rgb(32 29 24 / 0.22);
+    }
+
+    button:focus-visible {
+      outline: 3px dashed #725c38;
+      outline-offset: 5px;
+    }
+
+    button:disabled {
+      cursor: wait;
+      opacity: 0.62;
+    }
+
+    .footnote {
+      margin: 1px 0 0;
+      color: #766f63;
+      font-family: system-ui, sans-serif;
+      font-size: 12px;
+      letter-spacing: 0.05em;
+    }
+
+    @media (max-width: 430px) {
+      .game {
+        padding-inline: 7px;
+      }
+
+      .intro {
+        margin-bottom: 8px;
+      }
+
+      .grade-label {
+        font-size: 20px;
+      }
+
+      .scale-number {
+        font-size: 17px;
+      }
+
+      .controls {
+        width: calc(100% - 14px);
+        margin-top: -8px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .result,
+      button {
+        transition: none;
+      }
+
+      .result[data-kind="spinning"] .result__main {
+        animation: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="game">
+    <header>
+      <h1>聪明程度转盘</h1>
+      <p class="intro">转动指针，看看它会停在哪一道刻度上</p>
+    </header>
+
+    <section
+      class="wheel-stage"
+      id="wheelStage"
+      data-arc-start="216"
+      data-arc-sweep="288"
+      data-gap-sweep="72"
+      aria-label="聪明程度刻度转盘"
+    >
+      <svg id="wheel" viewBox="0 0 620 590" role="img" aria-labelledby="wheelTitle wheelDescription">
+        <title id="wheelTitle">聪明程度转盘</title>
+        <desc id="wheelDescription">转盘有从零到一百的一百零一个刻度，底部六点钟方向留有一个不计分的空白缺口。</desc>
+        <g id="dial" aria-hidden="true">
+          <g id="arcLines"></g>
+          <g id="ticks"></g>
+          <g id="scaleNumbers"></g>
+          <g id="gradeLabels"></g>
+        </g>
+
+        <g id="pointer" data-angle="0" data-final-angle="0" aria-hidden="true">
+          <path class="needle" d="M 310 73 L 317 293 L 310 345 L 303 293 Z" />
+          <path class="needle-highlight" d="M 309 87 L 311 288" />
+          <circle class="hub-outer" cx="310" cy="310" r="19" />
+          <circle class="hub-inner" cx="310" cy="310" r="8" />
+        </g>
+      </svg>
+    </section>
+
+    <section class="controls" aria-label="转盘操作与结果">
+      <div class="result" id="result" data-kind="idle" role="status" aria-live="polite" aria-atomic="true">
+        <div>
+          <div class="result__hint">指针停稳后，结果会显示在这里</div>
+          <div class="result__main">准备好了吗？</div>
+        </div>
+      </div>
+      <button id="spinButton" type="button">转一下</button>
+      <p class="footnote">0—100 真实刻度 · 底部缺口不属于正常结果区</p>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const SVG_NS = "http://www.w3.org/2000/svg";
+      const CX = 310;
+      const CY = 310;
+      const OUTER_RADIUS = 235;
+      const INNER_GUIDE_RADIUS = 198;
+      const NUMBER_RADIUS = 181;
+      const GRADE_RADIUS = 284;
+      const ARC_START = 216;
+      const ARC_SWEEP = 288;
+      const GAP_SWEEP = 360 - ARC_SWEEP;
+      const GAP_START = (ARC_START + ARC_SWEEP) % 360;
+      const LEVELS = [
+        "大笨蛋",
+        "很笨",
+        "笨",
+        "有点笨",
+        "普通",
+        "偏聪明",
+        "比较聪明",
+        "聪明",
+        "很聪明",
+        "天才"
+      ];
+      const EGGS = ["Orc", "Goblin", "小猪佩奇", "外星人", "隐藏Boss", "超级土豆"];
+      const EGG_TONES = ["#5d358c", "#287348", "#81406f", "#3a6f77"];
+
+      const pointer = document.querySelector("#pointer");
+      const button = document.querySelector("#spinButton");
+      const result = document.querySelector("#result");
+      const arcLines = document.querySelector("#arcLines");
+      const ticks = document.querySelector("#ticks");
+      const scaleNumbers = document.querySelector("#scaleNumbers");
+      const gradeLabels = document.querySelector("#gradeLabels");
+
+      const state = {
+        angle: 0,
+        spinning: false,
+        animation: null,
+        spinCount: 0
+      };
+
+      function modulo(value, divisor = 360) {
+        return ((value % divisor) + divisor) % divisor;
+      }
+
+      function polar(angle, radius) {
+        const radians = angle * Math.PI / 180;
+        return {
+          x: CX + radius * Math.sin(radians),
+          y: CY - radius * Math.cos(radians)
+        };
+      }
+
+      function arcPath(radius, start = ARC_START, sweep = ARC_SWEEP) {
+        const from = polar(start, radius);
+        const to = polar(start + sweep, radius);
+        const largeArc = sweep > 180 ? 1 : 0;
+        return `M ${from.x.toFixed(3)} ${from.y.toFixed(3)} A ${radius} ${radius} 0 ${largeArc} 1 ${to.x.toFixed(3)} ${to.y.toFixed(3)}`;
+      }
+
+      function createSvg(tag, attributes = {}) {
+        const element = document.createElementNS(SVG_NS, tag);
+        for (const [name, value] of Object.entries(attributes)) {
+          element.setAttribute(name, String(value));
+        }
+        return element;
+      }
+
+      function buildDial() {
+        const outer = createSvg("path", {
+          class: "rough-line outer-arc",
+          d: arcPath(OUTER_RADIUS)
+        });
+        const echo = createSvg("path", {
+          class: "rough-line echo-arc",
+          d: arcPath(OUTER_RADIUS + 2.5, ARC_START + 0.18, ARC_SWEEP - 0.36)
+        });
+        const inner = createSvg("path", {
+          class: "rough-line inner-arc",
+          d: arcPath(INNER_GUIDE_RADIUS)
+        });
+        arcLines.append(outer, echo, inner);
+
+        for (let value = 0; value <= 100; value += 1) {
+          const angle = ARC_START + ARC_SWEEP * value / 100;
+          const isMajor = value % 10 === 0;
+          const isMid = !isMajor && value % 5 === 0;
+          const length = isMajor ? 34 : isMid ? 25 : 15;
+          const start = polar(angle, OUTER_RADIUS - length);
+          const end = polar(angle, OUTER_RADIUS - 1);
+          const tick = createSvg("line", {
+            class: `tick tick--${isMajor ? "major" : isMid ? "mid" : "small"}`,
+            x1: start.x.toFixed(3),
+            y1: start.y.toFixed(3),
+            x2: end.x.toFixed(3),
+            y2: end.y.toFixed(3),
+            "data-value": value,
+            "data-angle": modulo(angle).toFixed(3)
+          });
+          ticks.append(tick);
+
+          if (isMajor) {
+            const labelPoint = polar(angle, NUMBER_RADIUS);
+            const label = createSvg("text", {
+              class: "scale-number",
+              x: labelPoint.x.toFixed(3),
+              y: (labelPoint.y + 5).toFixed(3),
+              "data-value": value
+            });
+            label.textContent = String(value);
+            scaleNumbers.append(label);
+          }
+        }
+
+        LEVELS.forEach((level, index) => {
+          const valueAtMiddle = index * 10 + 4.5;
+          const angle = ARC_START + ARC_SWEEP * valueAtMiddle / 100;
+          const point = polar(angle, GRADE_RADIUS);
+          const label = createSvg("text", {
+            class: "grade-label",
+            x: point.x.toFixed(3),
+            y: (point.y + 6).toFixed(3),
+            "data-level-index": index,
+            "data-level": level
+          });
+          label.textContent = level;
+          gradeLabels.append(label);
+        });
+      }
+
+      function angleForValue(value) {
+        const safeValue = Math.max(0, Math.min(100, Math.round(Number(value))));
+        return modulo(ARC_START + ARC_SWEEP * safeValue / 100);
+      }
+
+      function levelForValue(value) {
+        const index = Math.min(LEVELS.length - 1, Math.floor(value / 10));
+        return LEVELS[index];
+      }
+
+      function outcomeForAngle(angle) {
+        const normalizedAngle = modulo(Number(angle));
+        const distanceFromStart = modulo(normalizedAngle - ARC_START);
+        if (distanceFromStart <= ARC_SWEEP + 1e-7) {
+          const value = Math.max(0, Math.min(100, Math.round(distanceFromStart / ARC_SWEEP * 100)));
+          return {
+            kind: "normal",
+            angle: normalizedAngle,
+            value,
+            level: levelForValue(value)
+          };
+        }
+        return { kind: "egg", angle: normalizedAngle };
+      }
+
+      function randomUnit() {
+        if (window.crypto && typeof window.crypto.getRandomValues === "function") {
+          const buffer = new Uint32Array(1);
+          window.crypto.getRandomValues(buffer);
+          return buffer[0] / 4294967296;
+        }
+        return Math.random();
+      }
+
+      function randomInteger(min, max) {
+        return min + Math.floor(randomUnit() * (max - min + 1));
+      }
+
+      function chooseTarget() {
+        const landsInGap = randomUnit() < GAP_SWEEP / 360;
+        if (landsInGap) {
+          const edgeMargin = 5;
+          return {
+            kind: "egg",
+            targetAngle: modulo(GAP_START + edgeMargin + randomUnit() * (GAP_SWEEP - edgeMargin * 2))
+          };
+        }
+        const value = randomInteger(0, 100);
+        return {
+          kind: "normal",
+          value,
+          targetAngle: angleForValue(value)
+        };
+      }
+
+      function setSpinningResult() {
+        result.dataset.kind = "spinning";
+        result.removeAttribute("data-value");
+        result.removeAttribute("data-level");
+        result.innerHTML = `
+          <div>
+            <div class="result__hint">指针正在真实旋转</div>
+            <div class="result__main">先快，后慢……</div>
+          </div>
+        `;
+      }
+
+      function renderOutcome(outcome) {
+        if (outcome.kind === "normal") {
+          result.dataset.kind = "normal";
+          result.dataset.value = String(outcome.value);
+          result.dataset.level = outcome.level;
+          result.style.removeProperty("--egg-tone");
+          result.innerHTML = `
+            <div>
+              <div class="result__hint">指针所指的真实刻度</div>
+              <div class="result__main">刻度 <span class="result__value">${outcome.value}</span> · ${outcome.level}</div>
+            </div>
+          `;
+          return outcome;
+        }
+
+        const egg = EGGS[randomInteger(0, EGGS.length - 1)];
+        const tone = EGG_TONES[randomInteger(0, EGG_TONES.length - 1)];
+        result.dataset.kind = "egg";
+        result.dataset.egg = egg;
+        result.removeAttribute("data-value");
+        result.removeAttribute("data-level");
+        result.style.setProperty("--egg-tone", tone);
+        result.innerHTML = `
+          <div>
+            <div class="result__hint">掉进底部空白缺口 · 彩蛋！</div>
+            <div class="result__main">${egg}</div>
+          </div>
+        `;
+        return { ...outcome, egg, tone };
+      }
+
+      function durationForMotion(requestedDuration) {
+        if (Number.isFinite(requestedDuration)) {
+          return Math.max(80, Number(requestedDuration));
+        }
+        return window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 1500 : 5000;
+      }
+
+      async function spinToAngle(targetAngle, options = {}) {
+        if (state.spinning) {
+          return null;
+        }
+
+        state.spinning = true;
+        state.spinCount += 1;
+        button.disabled = true;
+        button.textContent = "转动中";
+        setSpinningResult();
+
+        const startAngle = state.angle;
+        const startNormalized = modulo(startAngle);
+        const normalizedTarget = modulo(targetAngle);
+        const delta = modulo(normalizedTarget - startNormalized);
+        const turns = Number.isFinite(options.turns) ? Math.max(5, Math.round(options.turns)) : randomInteger(7, 10);
+        const finalAngle = startAngle + turns * 360 + delta;
+        const duration = durationForMotion(options.duration);
+
+        pointer.dataset.spinStart = String(startAngle);
+        pointer.dataset.spinEnd = String(finalAngle);
+        pointer.dataset.spinTurns = String(turns);
+        pointer.dataset.duration = String(duration);
+
+        const animation = pointer.animate(
+          [
+            { transform: `rotate(${startAngle}deg)` },
+            { transform: `rotate(${finalAngle}deg)` }
+          ],
+          {
+            duration,
+            easing: "cubic-bezier(0.08, 0.70, 0.15, 1)",
+            fill: "forwards"
+          }
+        );
+        state.animation = animation;
+
+        try {
+          await animation.finished;
+        } catch (error) {
+          if (error && error.name !== "AbortError") {
+            throw error;
+          }
+        }
+
+        const settledAngle = modulo(finalAngle);
+        pointer.style.transform = `rotate(${settledAngle}deg)`;
+        animation.cancel();
+        state.animation = null;
+        state.angle = settledAngle;
+        pointer.dataset.angle = settledAngle.toFixed(6);
+        pointer.dataset.finalAngle = settledAngle.toFixed(6);
+
+        const measuredOutcome = outcomeForAngle(settledAngle);
+        const renderedOutcome = renderOutcome(measuredOutcome);
+        state.spinning = false;
+        button.disabled = false;
+        button.textContent = "再转一下";
+
+        document.dispatchEvent(new CustomEvent("smartwheel:settled", {
+          detail: {
+            ...renderedOutcome,
+            finalAngle: settledAngle,
+            cumulativeFinalAngle: finalAngle,
+            normalizedAngle: settledAngle
+          }
+        }));
+        return renderedOutcome;
+      }
+
+      function spinRandom() {
+        const target = chooseTarget();
+        return spinToAngle(target.targetAngle);
+      }
+
+      button.addEventListener("click", spinRandom);
+      buildDial();
+      pointer.style.transform = "rotate(0deg)";
+
+      window.__smartWheel = Object.freeze({
+        config: Object.freeze({
+          arcStart: ARC_START,
+          arcSweep: ARC_SWEEP,
+          gapStart: GAP_START,
+          gapSweep: GAP_SWEEP,
+          levels: [...LEVELS],
+          eggs: [...EGGS]
+        }),
+        angleForValue,
+        outcomeForAngle,
+        chooseTarget,
+        spinRandom,
+        spinToValue(value, options = {}) {
+          const safeValue = Math.max(0, Math.min(100, Math.round(Number(value))));
+          return spinToAngle(angleForValue(safeValue), options);
+        },
+        spinToEgg(options = {}) {
+          const edgeMargin = 8;
+          const targetAngle = modulo(GAP_START + edgeMargin + randomUnit() * (GAP_SWEEP - edgeMargin * 2));
+          return spinToAngle(targetAngle, options);
+        },
+        snapshot() {
+          const normalizedAngle = modulo(state.angle);
+          return {
+            spinning: state.spinning,
+            spinCount: state.spinCount,
+            cumulativeAngle: state.angle,
+            normalizedAngle,
+            outcome: outcomeForAngle(normalizedAngle),
+            displayedKind: result.dataset.kind,
+            displayedValue: result.dataset.value ?? null,
+            displayedLevel: result.dataset.level ?? null,
+            displayedEgg: result.dataset.egg ?? null
+          };
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
