@@ -5,12 +5,12 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>聪明程度转盘</title>
 <style>
-*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:"Kaiti SC","STKaiti","KaiTi","PingFang SC",sans-serif}body{background:#f4f0e6;color:#25231f;display:flex;align-items:center;justify-content:center;padding:14px}main{width:min(760px,100%);text-align:center}h1{font-size:clamp(25px,5vw,38px);margin:0 0 4px}.tip{font-family:"PingFang SC",sans-serif;color:#6f695e;font-size:14px;margin-bottom:8px}.board{position:relative;width:min(94vw,680px);aspect-ratio:1;margin:auto;background:#fffdf6;border-radius:16px;box-shadow:0 14px 40px rgba(44,38,27,.16);padding:8px;overflow:hidden}.dial{width:100%;height:100%;display:block}.outer{fill:#fffef9;stroke:#2c2923;stroke-width:.55}.tick{stroke:#302d27;stroke-width:.18}.tick.mid{stroke-width:.28}.tick.major{stroke-width:.48}.num{font-size:1.42px;text-anchor:middle;dominant-baseline:central;fill:#4c4942;font-family:Arial,sans-serif}.label{font-size:3.3px;text-anchor:middle;dominant-baseline:central;fill:#27241f;font-weight:700}.pointer-wrap{position:absolute;inset:8px;transform-origin:50% 50%;will-change:transform;pointer-events:none}.pointer{position:absolute;left:50%;top:50%;width:39%;height:18px;transform:translateY(-50%);transform-origin:0 50%}.shaft{position:absolute;left:0;top:7px;width:88%;height:4px;background:#e74444;border:1px solid #672525;box-shadow:0 2px 4px rgba(0,0,0,.22)}.head{position:absolute;right:0;top:0;width:0;height:0;border-top:9px solid transparent;border-bottom:9px solid transparent;border-left:25px solid #e74444;filter:drop-shadow(1px 2px 1px rgba(0,0,0,.2))}.hub{position:absolute;left:50%;top:50%;width:25px;height:25px;border-radius:50%;background:#292620;border:5px solid #fff;transform:translate(-50%,-50%);box-shadow:0 2px 5px rgba(0,0,0,.3);z-index:3}.result{min-height:70px;font-family:"PingFang SC",sans-serif;font-size:clamp(23px,5vw,34px);font-weight:800;color:#c93045;margin:7px 0;line-height:1.4}button{border:0;border-radius:999px;padding:13px 30px;font-size:19px;font-weight:800;background:#303c91;color:#fff;box-shadow:0 8px 18px rgba(48,60,145,.25);cursor:pointer}button:disabled{opacity:.6}.small{font-family:"PingFang SC",sans-serif;font-size:12px;color:#817b70;margin-top:10px}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:"Kaiti SC","STKaiti","KaiTi","PingFang SC",sans-serif}body{background:#f4f0e6;color:#25231f;display:flex;align-items:center;justify-content:center;padding:14px}main{width:min(760px,100%);text-align:center}h1{font-size:clamp(25px,5vw,38px);margin:0 0 4px}.tip{font-family:"PingFang SC",sans-serif;color:#6f695e;font-size:14px;margin-bottom:8px}.board{position:relative;width:min(94vw,680px);aspect-ratio:1;margin:auto;background:#fffdf6;border-radius:16px;box-shadow:0 14px 40px rgba(44,38,27,.16);padding:8px;overflow:hidden}.dial{width:100%;height:100%;display:block}.outer{fill:#fffef9;stroke:#2c2923;stroke-width:.55}.tick{stroke:#302d27;stroke-width:.18}.tick.mid{stroke-width:.28}.tick.major{stroke-width:.48}.num{font-size:1.42px;text-anchor:middle;dominant-baseline:central;fill:#4c4942;font-family:Arial,sans-serif}.label{font-size:3.3px;text-anchor:middle;dominant-baseline:central;fill:#27241f;font-weight:700}.pointer-wrap{position:absolute;inset:8px;transform-origin:50% 50%;will-change:transform;pointer-events:none}.pointer{position:absolute;left:50%;top:50%;width:39%;height:18px;transform:translateY(-50%);transform-origin:0 50%}.shaft{position:absolute;left:0;top:7px;width:88%;height:4px;background:#e74444;border:1px solid #672525;box-shadow:0 2px 4px rgba(0,0,0,.22)}.head{position:absolute;right:0;top:0;width:0;height:0;border-top:9px solid transparent;border-bottom:9px solid transparent;border-left:25px solid #e74444;filter:drop-shadow(1px 2px 1px rgba(0,0,0,.2))}.hub{position:absolute;left:50%;top:50%;width:25px;height:25px;border-radius:50%;background:#292620;border:5px solid #fff;transform:translate(-50%,-50%);box-shadow:0 2px 5px rgba(0,0,0,.3);z-index:3}.result{min-height:70px;font-family:"PingFang SC",sans-serif;font-size:clamp(23px,5vw,34px);font-weight:800;color:#c93045;margin:7px 0;line-height:1.4;transition:color .25s,background .25s;border-color .25s}.result.special-green,.result.special-purple{display:inline-block;min-height:0;padding:8px 18px;border-radius:16px}.result.special-green{color:#16834b;background:#e7f8ee;border:2px solid #6bd39a}.result.special-purple{color:#7438a8;background:#f3e9ff;border:2px solid #b783e3}button{border:0;border-radius:999px;padding:13px 30px;font-size:19px;font-weight:800;background:#303c91;color:#fff;box-shadow:0 8px 18px rgba(48,60,145,.25);cursor:pointer}button:disabled{opacity:.6}.small{font-family:"PingFang SC",sans-serif;font-size:12px;color:#817b70;margin-top:10px}
 </style>
 </head>
 <body><main>
 <h1>聪明程度转盘</h1>
-<div class="tip">指针先快速转圈，再慢慢停下；也可能停在大块空白区域。</div>
+<div class="tip">落在刻度区时，数值与指针所指刻度完全一致；落在空白区时触发彩色隐藏结果。</div>
 <div class="board" id="board">
 <svg class="dial" id="dial" viewBox="0 0 100 100" aria-label="聪明程度转盘">
 <circle cx="50" cy="50" r="46" class="outer"/>
@@ -21,12 +21,12 @@
 </div>
 <div id="result" class="result">准备好了吗？</div>
 <button id="spin" type="button">转一下</button>
-<div class="small">这版使用网页普通元素旋转，不再使用Safari容易出问题的SVG指针动画。</div>
+<div class="small">刻度范围为0—100；空白区结果使用绿色或紫色显示。</div>
 </main>
 <script>
 (function(){
 var labels=["大笨蛋","很笨","笨","有点笨","普通","偏聪明","比较聪明","聪明","很聪明","天才"];
-var blankResults=["你是 Orc！","你是 Goblin！","你是小猪佩奇！","你是神秘外星人！","你是超级土豆！","你是隐藏Boss！"];
+var blankResults=["你是 Orc！","你是 Goblin！","你是小猪佩奇！","你是神秘外星人！","你是超级土豆！","你是隐藏 Boss！"];
 var start=235,span=250,svgNS="http://www.w3.org/2000/svg";
 var ticks=document.getElementById("ticks"),texts=document.getElementById("labels");
 function el(n,a,t){var e=document.createElementNS(svgNS,n);for(var k in a)e.setAttribute(k,a[k]);if(t!=null)e.textContent=t;return e}
@@ -35,28 +35,34 @@ for(var j=0;j<10;j++){var la=start+span*(j+.5)/10,lr=la*Math.PI/180,rr2=31.5,lx=
 var pointer=document.getElementById("pointerWrap"),btn=document.getElementById("spin"),board=document.getElementById("board"),result=document.getElementById("result");
 var angle=0,busy=false;
 function normalize(d){d%=360;if(d<0)d+=360;return d}
+function classifyStop(raw){
+ var test=raw;if(test<start)test+=360;
+ if(test>=start&&test<=start+span){
+   var exactTick=Math.round((test-start)/span*100);
+   exactTick=Math.max(0,Math.min(100,exactTick));
+   var snapped=start+span*exactTick/100;
+   var idx=Math.min(9,Math.floor(exactTick/10));
+   return {type:"scale",angle:normalize(snapped),score:exactTick,label:labels[idx]};
+ }
+ return {type:"blank",angle:raw,score:Math.floor(Math.random()*100)+1,label:blankResults[Math.floor(Math.random()*blankResults.length)]};
+}
 function spin(){
  if(busy)return;
- busy=true;btn.disabled=true;result.textContent="转起来啦……";
- var stopAngle=Math.random()*360;
+ busy=true;btn.disabled=true;result.className="result";result.textContent="转起来啦……";
+ var outcome=classifyStop(Math.random()*360);
  var rounds=8+Math.floor(Math.random()*5);
- angle=angle+rounds*360+normalize(stopAngle-normalize(angle));
+ angle=angle+rounds*360+normalize(outcome.angle-normalize(angle));
  pointer.style.transition="transform 5.5s cubic-bezier(.08,.72,.12,1)";
  pointer.style.webkitTransition="-webkit-transform 5.5s cubic-bezier(.08,.72,.12,1)";
  pointer.style.transform="rotate("+angle+"deg)";
  pointer.style.webkitTransform="rotate("+angle+"deg)";
  setTimeout(function(){
-   var final=normalize(angle);
-   var activeStart=start,activeEnd=start+span;
-   var test=final;if(test<activeStart)test+=360;
-   var score=Math.floor(Math.random()*100)+1;
-   if(test>=activeStart&&test<=activeEnd){
-      var pos=(test-activeStart)/span;
-      var idx=Math.min(9,Math.floor(pos*10));
-      result.textContent="结果："+labels[idx]+"，随机值 "+score;
+   if(outcome.type==="scale"){
+     result.className="result";
+     result.textContent="结果："+outcome.label+"，刻度 "+outcome.score;
    }else{
-      var funny=blankResults[Math.floor(Math.random()*blankResults.length)];
-      result.textContent=funny+" 随机值 "+score;
+     result.className="result "+(Math.random()<.5?"special-green":"special-purple");
+     result.textContent=outcome.label+" 隐藏数值 "+outcome.score;
    }
    busy=false;btn.disabled=false;
  },5600);
