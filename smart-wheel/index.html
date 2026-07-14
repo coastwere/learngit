@@ -5,33 +5,63 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>聪明程度转盘</title>
 <style>
-*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:"Kaiti SC","STKaiti","KaiTi","PingFang SC",sans-serif}body{background:#f4f0e6;color:#25231f;display:flex;align-items:center;justify-content:center;padding:14px}main{width:min(760px,100%);text-align:center}h1{font-size:clamp(25px,5vw,38px);margin:0 0 4px}.tip{font-family:"PingFang SC",sans-serif;color:#6f695e;font-size:14px;margin-bottom:8px}.board{width:min(94vw,680px);aspect-ratio:1;margin:auto;background:#fffdf6;border-radius:16px;box-shadow:0 14px 40px rgba(44,38,27,.16);padding:8px}svg{width:100%;height:100%;display:block;touch-action:manipulation}.outer{fill:#fffef9;stroke:#2c2923;stroke-width:.55}.tick{stroke:#302d27;stroke-width:.18}.tick.mid{stroke-width:.28}.tick.major{stroke-width:.48}.num{font-size:1.42px;text-anchor:middle;dominant-baseline:central;fill:#4c4942;font-family:Arial,sans-serif}.label{font-size:3.3px;text-anchor:middle;dominant-baseline:central;fill:#27241f;font-weight:700}.arrow{fill:#e74444;stroke:#672525;stroke-width:.35;filter:drop-shadow(0 1px 1px rgba(0,0,0,.25))}.hub{fill:#292620}.result{min-height:48px;font-family:"PingFang SC",sans-serif;font-size:clamp(25px,5vw,36px);font-weight:800;color:#c93045;margin:5px 0}button{border:0;border-radius:999px;padding:13px 30px;font-size:19px;font-weight:800;background:#303c91;color:#fff;box-shadow:0 8px 18px rgba(48,60,145,.25)}button:disabled{opacity:.6}.small{font-family:"PingFang SC",sans-serif;font-size:12px;color:#817b70;margin-top:10px}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:"Kaiti SC","STKaiti","KaiTi","PingFang SC",sans-serif}body{background:#f4f0e6;color:#25231f;display:flex;align-items:center;justify-content:center;padding:14px}main{width:min(760px,100%);text-align:center}h1{font-size:clamp(25px,5vw,38px);margin:0 0 4px}.tip{font-family:"PingFang SC",sans-serif;color:#6f695e;font-size:14px;margin-bottom:8px}.board{position:relative;width:min(94vw,680px);aspect-ratio:1;margin:auto;background:#fffdf6;border-radius:16px;box-shadow:0 14px 40px rgba(44,38,27,.16);padding:8px;overflow:hidden}.dial{width:100%;height:100%;display:block}.outer{fill:#fffef9;stroke:#2c2923;stroke-width:.55}.tick{stroke:#302d27;stroke-width:.18}.tick.mid{stroke-width:.28}.tick.major{stroke-width:.48}.num{font-size:1.42px;text-anchor:middle;dominant-baseline:central;fill:#4c4942;font-family:Arial,sans-serif}.label{font-size:3.3px;text-anchor:middle;dominant-baseline:central;fill:#27241f;font-weight:700}.pointer-wrap{position:absolute;inset:8px;transform-origin:50% 50%;will-change:transform;pointer-events:none}.pointer{position:absolute;left:50%;top:50%;width:39%;height:18px;transform:translateY(-50%);transform-origin:0 50%}.shaft{position:absolute;left:0;top:7px;width:88%;height:4px;background:#e74444;border:1px solid #672525;box-shadow:0 2px 4px rgba(0,0,0,.22)}.head{position:absolute;right:0;top:0;width:0;height:0;border-top:9px solid transparent;border-bottom:9px solid transparent;border-left:25px solid #e74444;filter:drop-shadow(1px 2px 1px rgba(0,0,0,.2))}.hub{position:absolute;left:50%;top:50%;width:25px;height:25px;border-radius:50%;background:#292620;border:5px solid #fff;transform:translate(-50%,-50%);box-shadow:0 2px 5px rgba(0,0,0,.3);z-index:3}.result{min-height:70px;font-family:"PingFang SC",sans-serif;font-size:clamp(23px,5vw,34px);font-weight:800;color:#c93045;margin:7px 0;line-height:1.4}button{border:0;border-radius:999px;padding:13px 30px;font-size:19px;font-weight:800;background:#303c91;color:#fff;box-shadow:0 8px 18px rgba(48,60,145,.25);cursor:pointer}button:disabled{opacity:.6}.small{font-family:"PingFang SC",sans-serif;font-size:12px;color:#817b70;margin-top:10px}
 </style>
 </head>
 <body><main>
 <h1>聪明程度转盘</h1>
-<div class="tip">大笨蛋与天才之间保留大块空白。点击红色指针或按钮开始。</div>
-<div class="board"><svg id="dial" viewBox="0 0 100 100" aria-label="聪明程度转盘">
+<div class="tip">指针先快速转圈，再慢慢停下；也可能停在大块空白区域。</div>
+<div class="board" id="board">
+<svg class="dial" id="dial" viewBox="0 0 100 100" aria-label="聪明程度转盘">
 <circle cx="50" cy="50" r="46" class="outer"/>
 <g id="ticks"></g><g id="labels"></g>
-<polygon id="arrow" points="50,48.8 50,51.2 88,50" class="arrow"/>
-<circle cx="50" cy="50" r="1.35" class="hub"/><circle cx="50" cy="50" r=".42" fill="#fff"/>
-</svg></div>
+</svg>
+<div class="pointer-wrap" id="pointerWrap"><div class="pointer"><div class="shaft"></div><div class="head"></div></div></div>
+<div class="hub"></div>
+</div>
 <div id="result" class="result">准备好了吗？</div>
 <button id="spin" type="button">转一下</button>
-<div class="small">指针只在有刻度的范围内出结果，空白区不会停。</div>
+<div class="small">这版使用网页普通元素旋转，不再使用Safari容易出问题的SVG指针动画。</div>
 </main>
 <script>
 (function(){
 var labels=["大笨蛋","很笨","笨","有点笨","普通","偏聪明","比较聪明","聪明","很聪明","天才"];
+var blankResults=["你是 Orc！","你是 Goblin！","你是小猪佩奇！","你是神秘外星人！","你是超级土豆！","你是隐藏Boss！"];
 var start=235,span=250,svgNS="http://www.w3.org/2000/svg";
 var ticks=document.getElementById("ticks"),texts=document.getElementById("labels");
 function el(n,a,t){var e=document.createElementNS(svgNS,n);for(var k in a)e.setAttribute(k,a[k]);if(t!=null)e.textContent=t;return e}
 for(var i=0;i<=100;i++){var a=start+span*i/100,r=a*Math.PI/180,inn=i%10===0?42.2:(i%5===0?43.2:44.1),out=46;ticks.appendChild(el("line",{x1:(50+inn*Math.cos(r)).toFixed(3),y1:(50+inn*Math.sin(r)).toFixed(3),x2:(50+out*Math.cos(r)).toFixed(3),y2:(50+out*Math.sin(r)).toFixed(3),class:"tick "+(i%10===0?"major":(i%5===0?"mid":""))}));if(i%5===0){var rr=39.7,x=50+rr*Math.cos(r),y=50+rr*Math.sin(r);ticks.appendChild(el("text",{x:x,y:y,transform:"rotate("+(a+90)+" "+x+" "+y+")",class:"num"},String(i)))}}
 for(var j=0;j<10;j++){var la=start+span*(j+.5)/10,lr=la*Math.PI/180,rr2=31.5,lx=50+rr2*Math.cos(lr),ly=50+rr2*Math.sin(lr),rot=la+90,norm=((rot%360)+360)%360;if(norm>90&&norm<270)rot+=180;texts.appendChild(el("text",{x:lx,y:ly,transform:"rotate("+rot+" "+lx+" "+ly+")",class:"label"},labels[j]))}
-var arrow=document.getElementById("arrow"),btn=document.getElementById("spin"),dial=document.getElementById("dial"),result=document.getElementById("result"),angle=0,busy=false;
-function setArrow(deg){var rad=deg*Math.PI/180,ux=Math.cos(rad),uy=Math.sin(rad),px=-uy,py=ux,base=1.2,tip=38;var p1=(50+px*base)+","+(50+py*base),p2=(50-px*base)+","+(50-py*base),p3=(50+ux*tip)+","+(50+uy*tip);arrow.setAttribute("points",p1+" "+p2+" "+p3)}
-function spin(){if(busy)return;busy=true;btn.disabled=true;result.textContent="转起来啦……";var targetScale=Math.floor(Math.random()*100),final=start+span*(targetScale+.5)/100,current=((angle%360)+360)%360,delta=((final-current)+360)%360,target=angle+360*(7+Math.floor(Math.random()*4))+delta,from=angle,t0=null,duration=4200;function frame(t){if(t0===null)t0=t;var p=Math.min(1,(t-t0)/duration),e=1-Math.pow(1-p,4);angle=from+(target-from)*e;setArrow(angle);if(p<1){requestAnimationFrame(frame)}else{angle=target;setArrow(angle);var idx=Math.min(9,Math.floor(targetScale/10));result.textContent="结果："+labels[idx]+"（"+(targetScale+1)+"格）";busy=false;btn.disabled=false}}requestAnimationFrame(frame)}
-btn.addEventListener("click",spin);dial.addEventListener("click",spin);dial.addEventListener("touchend",function(e){e.preventDefault();spin()},{passive:false});setArrow(0);
+var pointer=document.getElementById("pointerWrap"),btn=document.getElementById("spin"),board=document.getElementById("board"),result=document.getElementById("result");
+var angle=0,busy=false;
+function normalize(d){d%=360;if(d<0)d+=360;return d}
+function spin(){
+ if(busy)return;
+ busy=true;btn.disabled=true;result.textContent="转起来啦……";
+ var stopAngle=Math.random()*360;
+ var rounds=8+Math.floor(Math.random()*5);
+ angle=angle+rounds*360+normalize(stopAngle-normalize(angle));
+ pointer.style.transition="transform 5.5s cubic-bezier(.08,.72,.12,1)";
+ pointer.style.webkitTransition="-webkit-transform 5.5s cubic-bezier(.08,.72,.12,1)";
+ pointer.style.transform="rotate("+angle+"deg)";
+ pointer.style.webkitTransform="rotate("+angle+"deg)";
+ setTimeout(function(){
+   var final=normalize(angle);
+   var activeStart=start,activeEnd=start+span;
+   var test=final;if(test<activeStart)test+=360;
+   var score=Math.floor(Math.random()*100)+1;
+   if(test>=activeStart&&test<=activeEnd){
+      var pos=(test-activeStart)/span;
+      var idx=Math.min(9,Math.floor(pos*10));
+      result.textContent="结果："+labels[idx]+"，随机值 "+score;
+   }else{
+      var funny=blankResults[Math.floor(Math.random()*blankResults.length)];
+      result.textContent=funny+" 随机值 "+score;
+   }
+   busy=false;btn.disabled=false;
+ },5600);
+}
+btn.addEventListener("click",spin,false);board.addEventListener("click",spin,false);
 })();
-</script></body></html>
+</script>
+</body></html>
