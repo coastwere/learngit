@@ -5,82 +5,33 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>聪明程度转盘</title>
 <style>
-*{box-sizing:border-box} html,body{margin:0;min-height:100%;font-family:"Kaiti SC","STKaiti","KaiTi","PingFang SC",sans-serif}
-body{background:#f4f0e6;color:#25231f;display:flex;align-items:center;justify-content:center;padding:14px}
-main{width:min(760px,100%);text-align:center}
-h1{font-size:clamp(25px,5vw,38px);margin:0 0 4px;font-weight:700}
-.tip{font-family:"PingFang SC",sans-serif;color:#6f695e;font-size:14px;margin-bottom:8px}
-.board{position:relative;width:min(94vw,680px);aspect-ratio:1;margin:auto;background:#fffdf6;border-radius:16px;box-shadow:0 14px 40px rgba(44,38,27,.16);padding:8px}
-svg{width:100%;height:100%;display:block;touch-action:manipulation}
-.outer{fill:#fffef9;stroke:#2c2923;stroke-width:.55}
-.tick{stroke:#302d27;stroke-width:.18} .tick.mid{stroke-width:.28} .tick.major{stroke-width:.48}
-.num{font-size:1.42px;text-anchor:middle;dominant-baseline:central;fill:#4c4942;font-family:Arial,sans-serif}
-.label{font-size:3.3px;text-anchor:middle;dominant-baseline:central;fill:#27241f;font-weight:700}
-.hub{fill:#292620} .arrow{fill:#e74444;stroke:#672525;stroke-width:.35;filter:drop-shadow(0 1px 1px rgba(0,0,0,.25))}
-#pointer{transform-origin:50px 50px;transform:rotate(0deg)}
-.result{min-height:48px;font-family:"PingFang SC",sans-serif;font-size:clamp(25px,5vw,36px);font-weight:800;color:#c93045;margin:5px 0}
-button{border:0;border-radius:999px;padding:13px 30px;font-size:19px;font-weight:800;background:#303c91;color:#fff;box-shadow:0 8px 18px rgba(48,60,145,.25);cursor:pointer}
-button:disabled{opacity:.6} .small{font-family:"PingFang SC",sans-serif;font-size:12px;color:#817b70;margin-top:10px}
-</style></head>
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:"Kaiti SC","STKaiti","KaiTi","PingFang SC",sans-serif}body{background:#f4f0e6;color:#25231f;display:flex;align-items:center;justify-content:center;padding:14px}main{width:min(760px,100%);text-align:center}h1{font-size:clamp(25px,5vw,38px);margin:0 0 4px}.tip{font-family:"PingFang SC",sans-serif;color:#6f695e;font-size:14px;margin-bottom:8px}.board{width:min(94vw,680px);aspect-ratio:1;margin:auto;background:#fffdf6;border-radius:16px;box-shadow:0 14px 40px rgba(44,38,27,.16);padding:8px}svg{width:100%;height:100%;display:block;touch-action:manipulation}.outer{fill:#fffef9;stroke:#2c2923;stroke-width:.55}.tick{stroke:#302d27;stroke-width:.18}.tick.mid{stroke-width:.28}.tick.major{stroke-width:.48}.num{font-size:1.42px;text-anchor:middle;dominant-baseline:central;fill:#4c4942;font-family:Arial,sans-serif}.label{font-size:3.3px;text-anchor:middle;dominant-baseline:central;fill:#27241f;font-weight:700}.arrow{fill:#e74444;stroke:#672525;stroke-width:.35;filter:drop-shadow(0 1px 1px rgba(0,0,0,.25))}.hub{fill:#292620}.result{min-height:48px;font-family:"PingFang SC",sans-serif;font-size:clamp(25px,5vw,36px);font-weight:800;color:#c93045;margin:5px 0}button{border:0;border-radius:999px;padding:13px 30px;font-size:19px;font-weight:800;background:#303c91;color:#fff;box-shadow:0 8px 18px rgba(48,60,145,.25)}button:disabled{opacity:.6}.small{font-family:"PingFang SC",sans-serif;font-size:12px;color:#817b70;margin-top:10px}
+</style>
+</head>
 <body><main>
 <h1>聪明程度转盘</h1>
-<div class="tip">和手绘图一样：大笨蛋与天才之间保留大块空白。点击红色指针或按钮开始。</div>
-<div class="board">
-<svg id="dial" viewBox="0 0 100 100" aria-label="聪明程度转盘">
+<div class="tip">大笨蛋与天才之间保留大块空白。点击红色指针或按钮开始。</div>
+<div class="board"><svg id="dial" viewBox="0 0 100 100" aria-label="聪明程度转盘">
 <circle cx="50" cy="50" r="46" class="outer"/>
-<g id="ticks"></g>
-<g id="labels"></g>
-<g id="pointer">
-  <polygon points="50,48.8 50,51.2 88,50" class="arrow"/>
-  <circle cx="50" cy="50" r="1.35" class="hub"/>
-  <circle cx="50" cy="50" r=".42" fill="#fff"/>
-</g>
-</svg>
-</div>
+<g id="ticks"></g><g id="labels"></g>
+<polygon id="arrow" points="50,48.8 50,51.2 88,50" class="arrow"/>
+<circle cx="50" cy="50" r="1.35" class="hub"/><circle cx="50" cy="50" r=".42" fill="#fff"/>
+</svg></div>
 <div id="result" class="result">准备好了吗？</div>
 <button id="spin" type="button">转一下</button>
 <div class="small">指针只在有刻度的范围内出结果，空白区不会停。</div>
 </main>
 <script>
 (function(){
-  var labels=["大笨蛋","很笨","笨","有点笨","普通","偏聪明","比较聪明","聪明","很聪明","天才"];
-  var start=235, span=250;
-  var svgNS="http://www.w3.org/2000/svg";
-  var tickGroup=document.getElementById("ticks"),labelGroup=document.getElementById("labels");
-  function el(name,attrs,text){var e=document.createElementNS(svgNS,name);for(var k in attrs)e.setAttribute(k,attrs[k]);if(text!=null)e.textContent=text;return e;}
-  for(var i=0;i<=100;i++){
-    var a=start+span*i/100,rad=a*Math.PI/180;
-    var inner=i%10===0?42.2:(i%5===0?43.2:44.1),outer=46;
-    tickGroup.appendChild(el("line",{x1:(50+inner*Math.cos(rad)).toFixed(3),y1:(50+inner*Math.sin(rad)).toFixed(3),x2:(50+outer*Math.cos(rad)).toFixed(3),y2:(50+outer*Math.sin(rad)).toFixed(3),class:"tick "+(i%10===0?"major":(i%5===0?"mid":""))}));
-    if(i%5===0){var rr=39.7,tx=50+rr*Math.cos(rad),ty=50+rr*Math.sin(rad);tickGroup.appendChild(el("text",{x:tx.toFixed(3),y:ty.toFixed(3),transform:"rotate("+(a+90).toFixed(3)+" "+tx.toFixed(3)+" "+ty.toFixed(3)+")",class:"num"},String(i)));}
-  }
-  for(var j=0;j<labels.length;j++){
-    var la=start+span*(j+.5)/10,lr=la*Math.PI/180,rr2=31.5,lx=50+rr2*Math.cos(lr),ly=50+rr2*Math.sin(lr),rot=la+90;
-    if(((rot%360)+360)%360>90&&((rot%360)+360)%360<270)rot+=180;
-    labelGroup.appendChild(el("text",{x:lx.toFixed(3),y:ly.toFixed(3),transform:"rotate("+rot.toFixed(3)+" "+lx.toFixed(3)+" "+ly.toFixed(3)+")",class:"label"},labels[j]));
-  }
-  var pointer=document.getElementById("pointer"),btn=document.getElementById("spin"),dial=document.getElementById("dial"),result=document.getElementById("result");
-  var angle=0,busy=false;
-  function spin(){
-    if(busy)return;
-    busy=true;btn.disabled=true;result.textContent="转起来啦……";
-    var targetScale=Math.floor(Math.random()*100);
-    var finalAngle=start+span*(targetScale+.5)/100;
-    var current=((angle%360)+360)%360;
-    var delta=((finalAngle-current)+360)%360;
-    var target=angle+360*(7+Math.floor(Math.random()*4))+delta;
-    var t0=null,duration=4200,from=angle;
-    function frame(t){
-      if(t0===null)t0=t;
-      var p=Math.min(1,(t-t0)/duration),e=1-Math.pow(1-p,4);
-      angle=from+(target-from)*e;
-      pointer.setAttribute("transform","rotate("+angle+" 50 50)");
-      if(p<1)requestAnimationFrame(frame);else{angle=target;var idx=Math.min(9,Math.floor(targetScale/10));result.textContent="结果："+labels[idx]+"（"+(targetScale+1)+"格）";busy=false;btn.disabled=false;}
-    }
-    requestAnimationFrame(frame);
-  }
-  btn.addEventListener("click",spin);
-  dial.addEventListener("click",spin);
-  dial.addEventListener("touchend",function(e){e.preventDefault();spin()},{passive:false});
+var labels=["大笨蛋","很笨","笨","有点笨","普通","偏聪明","比较聪明","聪明","很聪明","天才"];
+var start=235,span=250,svgNS="http://www.w3.org/2000/svg";
+var ticks=document.getElementById("ticks"),texts=document.getElementById("labels");
+function el(n,a,t){var e=document.createElementNS(svgNS,n);for(var k in a)e.setAttribute(k,a[k]);if(t!=null)e.textContent=t;return e}
+for(var i=0;i<=100;i++){var a=start+span*i/100,r=a*Math.PI/180,inn=i%10===0?42.2:(i%5===0?43.2:44.1),out=46;ticks.appendChild(el("line",{x1:(50+inn*Math.cos(r)).toFixed(3),y1:(50+inn*Math.sin(r)).toFixed(3),x2:(50+out*Math.cos(r)).toFixed(3),y2:(50+out*Math.sin(r)).toFixed(3),class:"tick "+(i%10===0?"major":(i%5===0?"mid":""))}));if(i%5===0){var rr=39.7,x=50+rr*Math.cos(r),y=50+rr*Math.sin(r);ticks.appendChild(el("text",{x:x,y:y,transform:"rotate("+(a+90)+" "+x+" "+y+")",class:"num"},String(i)))}}
+for(var j=0;j<10;j++){var la=start+span*(j+.5)/10,lr=la*Math.PI/180,rr2=31.5,lx=50+rr2*Math.cos(lr),ly=50+rr2*Math.sin(lr),rot=la+90,norm=((rot%360)+360)%360;if(norm>90&&norm<270)rot+=180;texts.appendChild(el("text",{x:lx,y:ly,transform:"rotate("+rot+" "+lx+" "+ly+")",class:"label"},labels[j]))}
+var arrow=document.getElementById("arrow"),btn=document.getElementById("spin"),dial=document.getElementById("dial"),result=document.getElementById("result"),angle=0,busy=false;
+function setArrow(deg){var rad=deg*Math.PI/180,ux=Math.cos(rad),uy=Math.sin(rad),px=-uy,py=ux,base=1.2,tip=38;var p1=(50+px*base)+","+(50+py*base),p2=(50-px*base)+","+(50-py*base),p3=(50+ux*tip)+","+(50+uy*tip);arrow.setAttribute("points",p1+" "+p2+" "+p3)}
+function spin(){if(busy)return;busy=true;btn.disabled=true;result.textContent="转起来啦……";var targetScale=Math.floor(Math.random()*100),final=start+span*(targetScale+.5)/100,current=((angle%360)+360)%360,delta=((final-current)+360)%360,target=angle+360*(7+Math.floor(Math.random()*4))+delta,from=angle,t0=null,duration=4200;function frame(t){if(t0===null)t0=t;var p=Math.min(1,(t-t0)/duration),e=1-Math.pow(1-p,4);angle=from+(target-from)*e;setArrow(angle);if(p<1){requestAnimationFrame(frame)}else{angle=target;setArrow(angle);var idx=Math.min(9,Math.floor(targetScale/10));result.textContent="结果："+labels[idx]+"（"+(targetScale+1)+"格）";busy=false;btn.disabled=false}}requestAnimationFrame(frame)}
+btn.addEventListener("click",spin);dial.addEventListener("click",spin);dial.addEventListener("touchend",function(e){e.preventDefault();spin()},{passive:false});setArrow(0);
 })();
 </script></body></html>
